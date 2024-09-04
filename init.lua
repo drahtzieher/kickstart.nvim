@@ -91,7 +91,12 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+vim.opt.termguicolors = true
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -353,7 +358,7 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
-      -- Useful for getting pretty icons, but requires a Nerd Font.
+      -- Useful for getting pretty icons, but  a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
@@ -607,7 +612,6 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -831,15 +835,15 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+    -- init = function()
+    -- Load the colorscheme here.
+    -- Like many other themes, this one has different styles, and you could load
+    -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+    -- vim.cmd.colorscheme 'tokyonight-night'
 
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
-    end,
+    -- You can configure highlights by doing something like:
+    -- vim.cmd.hi 'Comment gui=none'
+    -- end,
   },
 
   -- Highlight todo, notes, etc in comments
@@ -907,8 +911,159 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
+    init = function()
+      -- Set the colorscheme
+      vim.cmd.colorscheme 'catppuccin'
+      -- Customize Comment highlight (optional)
+      vim.cmd.hi 'Comment gui=none'
+    end,
+    config = function()
+      -- Configure the Catppuccin plugin
+      require('catppuccin').setup {
+        flavor = 'mocha', -- Choose the Catppuccin flavor
+        transparent_background = true,
+        integrations = {
+          cmp = true,
+          gitsigns = true,
+          nvimtree = true,
+          treesitter = true,
+          mason = true,
+          fidget = true,
+          telescope = {
+            enabled = true,
+          },
+          notify = false,
+          mini = {
+            enabled = true,
+            indentscope_color = '',
+          },
+        },
+      }
+    end,
+  },
+  {
+    'rebelot/kanagawa.nvim',
+    priority = 1000,
+  },
+  {
+    'marko-cerovac/material.nvim',
+    priority = 1000,
+  },
+  {
+    'sainnhe/gruvbox-material',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.g.gruvbox_material_enable_italic = true
+    end,
+  },
+  -- {
+  --   'nvim-tree/nvim-tree.lua',
+  --   dependencies = {
+  --     'nvim-tree/nvim-web-devicons',
+  --   },
+  --   config = function()
+  --     -- Configure nvim-tree options
+  --     require('nvim-tree').setup {
+  --       -- Your configuration here
+  --       hijack_netrw = true, -- Disable netrw
+  --       view = {
+  --         width = 30,
+  --         side = 'left',
+  --       },
+  --       renderer = {
+  --         highlight_opened_files = 'name',
+  --       },
+  --       filters = {
+  --         dotfiles = false, -- Show hidden files
+  --       },
+  --     }
+  --   end,
+  -- },
+  -- {
+  --   'akinsho/bufferline.nvim',
+  --   version = '*',
+  --   dependencies = 'nvim-tree/nvim-web-devicons',
+  --   config = function()
+  --     require('bufferline').setup {}
+  --   end,
+  -- },
+  {
+    'sindrets/diffview.nvim',
+  },
 
-  -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
+      'sindrets/diffview.nvim', -- optional - Diff integration
+
+      -- Only one of these is needed, not both.
+      'nvim-telescope/telescope.nvim', -- optional
+      --"ibhagwan/fzf-lua",              -- optional
+    },
+    config = true,
+  },
+  {
+    'ramilito/winbar.nvim',
+    event = 'VimEnter', -- Alternatively, BufReadPre if we don't care about the empty file when starting with 'nvim'
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('winbar').setup {
+        -- your configuration comes here, for example:
+        icons = true,
+        diagnostics = true,
+        buf_modified = true,
+        buf_modified_symbol = 'M',
+        -- or use an icon
+        -- buf_modified_symbol = "●"
+        dim_inactive = {
+          enabled = false,
+          highlight = 'WinbarNC',
+          icons = true, -- whether to dim the icons
+          name = true, -- whether to dim the name
+        },
+      }
+    end,
+  },
+  {
+    'nanozuki/tabby.nvim',
+    -- event = 'VimEnter', -- if you want lazy load, see below
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('tabby').setup {
+        preset = 'active_wins_at_tail',
+        option = {
+          theme = {
+            fill = 'TabLineFill', -- tabline background
+            head = 'TabLine', -- head element highlight
+            current_tab = 'TabLineSel', -- current tab label highlight
+            tab = 'TabLine', -- other tab label highlight
+            win = 'TabLine', -- window highlight
+            tail = 'TabLine', -- tail element highlight
+          },
+          nerdfont = true, -- whether use nerdfont
+          lualine_theme = nil, -- lualine theme name
+          tab_name = {
+            name_fallback = function(tabid)
+              return tabid
+            end,
+          },
+          buf_name = {
+            mode = "'unique'|'relative'|'tail'|'shorten'",
+          },
+        },
+      }
+    end,
+  },
+
+  -- -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
 
@@ -918,11 +1073,11 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

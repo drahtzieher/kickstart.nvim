@@ -111,7 +111,6 @@ vim.opt.number = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
-
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
@@ -467,8 +466,17 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
-
+      {
+        'j-hui/fidget.nvim',
+        opts = {
+          -- Set the `winblend` option correctly using nested tables
+          notification = {
+            window = {
+              winblend = 10,
+            },
+          },
+        },
+      },
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
     },
@@ -845,10 +853,25 @@ require('lazy').setup({
     -- vim.cmd.hi 'Comment gui=none'
     -- end,
   },
-
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
+  {
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = { signs = true },
+    vim.keymap.set('n', ']t', function()
+      require('todo-comments').jump_next()
+    end, { desc = 'Next todo comment' }),
+    vim.keymap.set('n', '[t', function()
+      require('todo-comments').jump_prev()
+    end, { desc = 'Previous todo comment' }),
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {--[[ things you want to change go here]]
+    },
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -881,9 +904,33 @@ require('lazy').setup({
       statusline.section_location = function()
         return '%2l:%-2v'
       end
-
+      require('mini.map').setup()
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
+    end,
+  },
+  {
+    'numToStr/Comment.nvim',
+    opts = {
+      -- add any options here
+    },
+  },
+  {
+    'stevearc/oil.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('oil').setup {
+        columns = { 'icon' },
+        keymaps = {
+          ['<C-h>'] = false,
+          ['<M-h>'] = 'actions.select_split',
+        },
+        view_options = {
+          show_hidden = true,
+        },
+      }
+      vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+      vim.keymap.set('n', '<space>-', require('oil').toggle_float)
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -919,7 +966,7 @@ require('lazy').setup({
       -- Set the colorscheme
       vim.cmd.colorscheme 'catppuccin'
       -- Customize Comment highlight (optional)
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
     end,
     config = function()
       -- Configure the Catppuccin plugin
@@ -932,7 +979,7 @@ require('lazy').setup({
           nvimtree = true,
           treesitter = true,
           mason = true,
-          fidget = true,
+          fidget = false,
           telescope = {
             enabled = true,
           },
@@ -997,7 +1044,9 @@ require('lazy').setup({
   {
     'sindrets/diffview.nvim',
   },
-
+  {
+    'f-person/git-blame.nvim',
+  },
   {
     'NeogitOrg/neogit',
     dependencies = {
@@ -1033,10 +1082,28 @@ require('lazy').setup({
     end,
   },
   {
+    'dstein64/nvim-scrollview',
+    config = function()
+      -- Configure nvim-scrollview options here
+      require('scrollview').setup {
+        -- Scrollbar options, adjust these as needed
+        excluded_filetypes = { 'nerdtree', 'fzf', 'dashboard' }, -- Exclude certain filetypes
+        current_only = false, -- Show scrollbar for all windows, not just the current one
+        base = 'right', -- Position the scrollbar on the right side
+        column = 1, -- Set the column where the scrollbar is placed
+        signs_column = false, -- Whether to use the signs column for the scrollbar
+        winblend = 75, -- Transparency level (0 for opaque, 100 for fully transparent)
+        width = 2, -- Width of the scrollbar
+        auto_hide = true, -- Auto-hide when not scrolling
+      }
+    end,
+  },
+  {
     'nanozuki/tabby.nvim',
     -- event = 'VimEnter', -- if you want lazy load, see below
     dependencies = 'nvim-tree/nvim-web-devicons',
     config = function()
+      vim.o.showtabline = 2
       require('tabby').setup {
         preset = 'active_wins_at_tail',
         option = {
@@ -1052,11 +1119,11 @@ require('lazy').setup({
           lualine_theme = nil, -- lualine theme name
           tab_name = {
             name_fallback = function(tabid)
-              return tabid
+              return tostring(tabid)
             end,
           },
           buf_name = {
-            mode = "'unique'|'relative'|'tail'|'shorten'",
+            mode = 'unique', --'relative'|'tail'|'shorten'",
           },
         },
       }

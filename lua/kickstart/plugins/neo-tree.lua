@@ -13,5 +13,5 @@ return {
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
-  opts = require 'neotree',
+  opts = require 'custom.plugins.neo-tree',
 }

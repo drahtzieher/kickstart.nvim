@@ -976,7 +976,7 @@ require('lazy').setup({
         integrations = {
           cmp = true,
           gitsigns = true,
-          nvimtree = true,
+          nvimtree = false,
           treesitter = true,
           mason = true,
           fidget = false,
@@ -1058,6 +1058,9 @@ require('lazy').setup({
       --"ibhagwan/fzf-lua",              -- optional
     },
     config = true,
+  },
+  {
+    'simrat39/symbols-outline.nvim',
   },
   {
     'ramilito/winbar.nvim',
